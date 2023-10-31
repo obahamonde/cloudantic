@@ -1,0 +1,33 @@
+version: "3.7"
+
+services:
+  localstack:
+    image: localstack/localstack
+    container_name: localstack
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=s3,dynamodb,kinesis,lambda
+      - DEBUG=1
+      - DATA_DIR=$HOME/.localstack/data
+  app:
+
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: app
+    container_name: app
+    restart: unless-stopped
+    volumes:
+      - ./:/app
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    networks:
+      - app-network
+
+  
+networks:
+  app-network:
+    driver: bridge
